@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PDF Merger Pro</title>
+  <link rel="stylesheet" href="style.css">
+  
+  <!-- External Libraries -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
+  <script src="https://unpkg.com/pdf-lib/dist/pdf-lib.min.js"></script>
+</head>
+<body class="dark">
+  <header>
+    <div class="logo">
+      📄 PDF Merger Pro
+    </div>
+    <div class="header-controls">
+      <button class="pricing-btn" id="pricingBtn">💰 Premium ₹9</button>
+      <button class="login-btn" id="loginBtn">👤 Login</button>
+      <a href="https://www.linkedin.com/in/prajwalindra-h-7b2841319" target="_blank" class="linkedin-btn">🔗 LinkedIn</a>
+      <button class="lang-toggle" id="langToggle">🌐 ಕನ್ನಡ</button>
+      <button class="dark-toggle" id="darkToggle">☀️ Light Mode</button>
+    </div>
+  </header>
+
+  <div class="container">
+    <div class="main-card">
+      <div class="title">
+        <h1>Merge Your PDFs</h1>
+        <p>Combine multiple PDF files into one document with ease</p>
+      </div>
+
+      <input type="file" id="fileInput" multiple accept="application/pdf" hidden>
+      
+      <div class="drop-zone" id="dropArea">
+        <div class="drop-zone-content">
+          <div class="upload-icon">📁</div>
+          <h3>Drop your PDF files here</h3>
+          <p>or click the button below to select files</p>
+          <button class="upload-btn" id="fileInputBtn">
+            Choose PDF Files
+          </button>
+        </div>
+      </div>
+
+      <div class="controls">
+        <div class="input-group">
+          <label for="outputName">Output filename (optional)</label>
+          <input 
+            type="text" 
+            id="outputName" 
+            class="modern-input" 
+            placeholder="Enter merged file name..."
+          >
+        </div>
+        <div class="input-group">
+          <label for="sortFiles">Sort files</label>
+          <select id="sortFiles" class="sort-select">
+            <option value="none">No sorting</option>
+            <option value="az">A → Z</option>
+            <option value="za">Z → A</option>
+            <option value="numeric-asc">1 → 9 (Numeric)</option>
+            <option value="numeric-desc">9 → 1 (Numeric)</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="file-list" id="fileList">
+        <div class="empty-state">
+          No PDF files selected yet. Upload some files to get started!
+        </div>
+      </div>
+
+      <div id="summary" class="summary" style="display: none;"></div>
+
+      <div class="options">
+        <div class="basic-section">
+          <div class="section-header">
+            <div class="section-header-left">
+              <span class="basic-badge">💼 STANDARD</span>
+              <h3>Core Features</h3>
+            </div>
+            <div class="section-header-right">
+              <p class="section-description">Professional PDF merging with essential tools</p>
+            </div>
+          </div>
+          
+          <div class="option-item">
+            <input type="checkbox" id="passwordOption" class="checkbox">
+            <label for="passwordOption">
+              🔒 Document Security Protection
+            </label>
+          </div>
+          
+          <div class="password-section" id="passwordSection" style="display: none;">
+            <input type="password" id="pdfPassword" class="modern-input" placeholder="Enter password for PDF..." maxlength="50">
+          </div>
+          
+          <div class="option-item">
+            <input type="checkbox" id="rotateOption" class="checkbox">
+            <label for="rotateOption">
+              🔄 Page Orientation Control
+            </label>
+          </div>
+          
+          <div class="rotation-section" id="rotationSection" style="display: none;">
+            <div class="rotation-controls">
+              <label for="rotationAngle">Rotation angle:</label>
+              <select id="rotationAngle" class="sort-select">
+                <option value="90">90° Clockwise</option>
+                <option value="180">180° (Upside down)</option>
+                <option value="270">270° (90° Counter-clockwise)</option>
+              </select>
+            </div>
+          </div>
+          
+          <div class="option-item">
+            <input type="checkbox" id="compressOption" class="checkbox">
+            <label for="compressOption">
+              📦 File Size Optimization
+            </label>
+          </div>
+          
+          <div class="compression-section" id="compressionSection" style="display: none;">
+            <div class="compression-controls">
+              <label for="compressionLevel">Compression level:</label>
+              <select id="compressionLevel" class="sort-select">
+                <option value="none">No compression (Original quality)</option>
+                <option value="low">Low compression (High quality, larger file)</option>
+                <option value="medium" selected>Medium compression (Balanced)</option>
+                <option value="high">High compression (Lower quality, smaller file)</option>
+              </select>
+            </div>
+          </div>
+          
+          <div class="option-item">
+            <input type="checkbox" id="removeBlankOption" class="checkbox">
+            <label for="removeBlankOption">
+              🗑️ Intelligent Blank Page Removal
+            </label>
+          </div>
+        </div>
+        
+        <div class="premium-section">
+          <div class="premium-header">
+            <div class="premium-header-left">
+              <span class="premium-badge">✨ PREMIUM</span>
+              <h3>Premium Features</h3>
+            </div>
+            <div class="premium-header-right">
+              <p class="section-description">Advanced tools for enhanced productivity</p>
+            </div>
+          </div>
+          
+          <div class="option-item">
+            <input type="checkbox" id="watermarkOption" class="checkbox" disabled>
+            <label for="watermarkOption">
+              💧 Custom Document Watermarking
+            </label>
+          </div>
+          
+          <div class="watermark-section" id="watermarkSection" style="display: none;">
+            <div class="watermark-controls">
+              <input type="text" id="watermarkText" class="modern-input" placeholder="Watermark text..." maxlength="100">
+              <select id="watermarkPosition" class="sort-select">
+                <option value="center">Center</option>
+                <option value="top-left">Top Left</option>
+                <option value="top-right">Top Right</option>
+                <option value="bottom-left">Bottom Left</option>
+                <option value="bottom-right">Bottom Right</option>
+              </select>
+              <select id="watermarkSize" class="sort-select">
+                <option value="12">Small (12pt)</option>
+                <option value="18">Medium (18pt)</option>
+                <option value="24" selected>Large (24pt)</option>
+                <option value="36">Extra Large (36pt)</option>
+                <option value="48">Huge (48pt)</option>
+              </select>
+            </div>
+          </div>
+          
+          <div class="option-item">
+            <input type="checkbox" id="bookmarkOption" class="checkbox" disabled>
+            <label for="bookmarkOption">
+              📑 Automated Document Navigation
+            </label>
+          </div>
+          
+          <div class="option-item">
+            <input type="checkbox" id="pageRangeOption" class="checkbox" disabled>
+            <label for="pageRangeOption">
+              📑 Precision Page Selection
+            </label>
+          </div>
+          
+          <div class="option-item">
+            <input type="checkbox" id="googleDriveOption" class="checkbox" disabled>
+            <label for="googleDriveOption">
+              📤 Cloud Storage Integration
+            </label>
+          </div>
+          
+          <div class="coupon-section">
+            <div class="coupon-header">
+              <span class="coupon-icon">🎫</span>
+              <span>Have a coupon code?</span>
+            </div>
+            <div class="coupon-input-group">
+              <input type="text" id="couponCode" class="modern-input" placeholder="Enter coupon code..." maxlength="20">
+              <button id="applyCoupon" class="coupon-btn">Apply</button>
+              <button id="removeCoupon" class="coupon-remove-btn" style="display: none;">Remove</button>
+            </div>
+          </div>
+          
+          <div class="premium-notice" id="premiumNotice">
+            <p>✨ Upgrade to Premium for advanced features and enhanced functionality</p>
+          </div>
+        </div>
+      </div>
+
+      <div id="validationAlert" class="validation-alert" style="display: none;">
+        <div class="alert-content">
+          <span class="alert-icon">⚠️</span>
+          <span class="alert-message" id="alertMessage"></span>
+          <button class="alert-close" id="alertClose">✖</button>
+        </div>
+      </div>
+
+      <div class="actions">
+        <button id="previewBtn" class="action-btn btn-preview">
+          <span class="btn-icon">👀</span>
+          <span class="btn-text">Preview PDF</span>
+        </button>
+        <button id="mergeBtn" class="action-btn btn-merge">
+          <span class="btn-icon">⚡</span>
+          <span class="btn-text">Merge PDFs</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    Made with ❤️ by 
+    <a href="https://www.linkedin.com/in/prajwalindra-h-7b2841319" target="_blank">
+      PRAJWALINDRA
+    </a>
+  </footer>
+
+  <div class="loading" id="loading">
+    <div class="loading-content">
+      <div class="spinner"></div>
+      <h3 id="loadingTitle">Processing your PDFs...</h3>
+      <p id="loadingText">This may take a few moments</p>
+      <div class="progress-container" id="progressContainer" style="display: none;">
+        <div class="progress-bar">
+          <div class="progress-fill" id="progressFill"></div>
+        </div>
+        <div class="progress-text" id="progressText">0%</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Login Modal -->
+  <div class="login-modal" id="loginModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>👤 User Login</h3>
+        <button class="modal-close" id="modalClose">✖</button>
+      </div>
+      <div class="modal-body">
+        <p class="login-notice">Please login to continue using PDF Merger Pro</p>
+        <div class="login-form">
+          <div class="input-group">
+            <label for="userName">Name:</label>
+            <input type="text" id="userName" class="modern-input" placeholder="Enter your name..." maxlength="50">
+          </div>
+          <div class="input-group">
+            <label for="userPasscode">Passcode:</label>
+            <input type="password" id="userPasscode" class="modern-input" placeholder="Enter passcode..." maxlength="20">
+          </div>
+          <button id="loginSubmit" class="login-submit-btn">Login</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
