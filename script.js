@@ -48,6 +48,7 @@ const userPasscode = document.getElementById('userPasscode');
 const loginSubmit = document.getElementById('loginSubmit');
 const pricingBtn = document.getElementById('pricingBtn');
 const langToggle = document.getElementById('langToggle');
+const imagesBtn = document.getElementById('imagesBtn');
 const shareBtn = document.getElementById('shareBtn');
 const shareModal = document.getElementById('shareModal');
 const shareModalClose = document.getElementById('shareModalClose');
@@ -58,6 +59,21 @@ const emailShareBtn = document.getElementById('emailShareBtn');
 const whatsappShareBtn = document.getElementById('whatsappShareBtn');
 const telegramShareBtn = document.getElementById('telegramShareBtn');
 const actionsDiv = document.querySelector('.actions');
+
+// Images to PDF elements
+const imageInput = document.getElementById('imageInput');
+const imageDropArea = document.getElementById('imageDropArea');
+const imageInputBtn = document.getElementById('imageInputBtn');
+const imageList = document.getElementById('imageList');
+const imageOutputName = document.getElementById('imageOutputName');
+const pageSize = document.getElementById('pageSize');
+const imageSummary = document.getElementById('imageSummary');
+const convertBtn = document.getElementById('convertBtn');
+const imageCompressOption = document.getElementById('imageCompressOption');
+const maintainAspectRatio = document.getElementById('maintainAspectRatio');
+
+let imageFiles = [];
+let currentSection = 'pdf'; // 'pdf' or 'images'
 
 // Language State
 let currentLang = 'en';
@@ -1704,4 +1720,219 @@ function cleanupExpiredShares() {
 
 // Run cleanup every hour
 setInterval(cleanupExpiredShares, 60 * 60 * 1000);
+
+// Section toggle functionality
+imagesBtn.addEventListener('click', () => {
+  const pdfSection = document.querySelector('.main-card:first-of-type');
+  const imageSection = document.getElementById('imageToPdfSection');
+  
+  if (currentSection === 'pdf') {
+    // Switch to Images section
+    pdfSection.style.display = 'none';
+    imageSection.style.display = 'block';
+    imagesBtn.textContent = '📄 PDFs';
+    imagesBtn.style.background = 'linear-gradient(135deg, #ff6b6b, #ee5a24)';
+    currentSection = 'images';
+  } else {
+    // Switch to PDF section
+    pdfSection.style.display = 'block';
+    imageSection.style.display = 'none';
+    imagesBtn.textContent = '🖼️ Images';
+    imagesBtn.style.background = 'rgba(255, 255, 255, 0.2)';
+    currentSection = 'pdf';
+  }
+});
+
+// Initially hide images section
+document.getElementById('imageToPdfSection').style.display = 'none';
+
+// Images to PDF functionality
+imageInputBtn.addEventListener('click', () => imageInput.click());
+
+imageDropArea.addEventListener('dragover', (e) => {
+  e.preventDefault();
+  imageDropArea.classList.add('dragover');
+});
+
+imageDropArea.addEventListener('dragleave', () => imageDropArea.classList.remove('dragover'));
+
+imageDropArea.addEventListener('drop', (e) => {
+  e.preventDefault();
+  imageDropArea.classList.remove('dragover');
+  handleImageFiles([...e.dataTransfer.files]);
+});
+
+imageInput.addEventListener('change', (e) => {
+  handleImageFiles([...e.target.files]);
+});
+
+function handleImageFiles(files) {
+  for (let file of files) {
+    if (file.type.startsWith('image/')) {
+      renderImageFile(file);
+    }
+  }
+}
+
+function renderImageFile(file) {
+  if (imageList.querySelector('.gallery-empty')) {
+    imageList.innerHTML = '<div class="image-grid"></div>';
+  }
+  
+  let grid = imageList.querySelector('.image-grid');
+  if (!grid) {
+    grid = document.createElement('div');
+    grid.className = 'image-grid';
+    imageList.appendChild(grid);
+  }
+
+  const sizeMB = (file.size / (1024 * 1024)).toFixed(2);
+  const img = new Image();
+  const reader = new FileReader();
+  
+  reader.onload = (e) => {
+    img.onload = () => {
+      const div = document.createElement('div');
+      div.className = 'image-item fade-in-up';
+      div.innerHTML = `
+        <img class="image-preview" src="${e.target.result}" alt="${file.name}"/>
+        <div class="image-info">
+          <div class="image-name">${file.name.length > 15 ? file.name.substring(0, 15) + '...' : file.name}</div>
+          <div class="image-meta">${img.width}×${img.height} • ${sizeMB}MB</div>
+        </div>
+        <button class="image-remove" title="Remove image">×</button>
+      `;
+      grid.appendChild(div);
+
+      const imageObj = { file, div, width: img.width, height: img.height };
+      imageFiles.push(imageObj);
+      
+      updateImageSummary();
+      
+      div.querySelector('.image-remove').onclick = () => {
+        imageFiles = imageFiles.filter(obj => obj !== imageObj);
+        div.remove();
+        if (imageFiles.length === 0) {
+          imageList.innerHTML = '<div class="gallery-empty"><div class="empty-icon">🖼️</div><p>Your images will appear here</p></div>';
+        }
+        updateImageSummary();
+      };
+    };
+    img.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+function updateImageSummary() {
+  if (!imageFiles.length) {
+    imageSummary.style.display = 'none';
+    return;
+  }
+  
+  const totalSize = imageFiles.reduce((sum, obj) => sum + obj.file.size, 0);
+  const sizeMB = (totalSize / (1024 * 1024)).toFixed(2);
+  
+  imageSummary.innerHTML = `
+    <span class="summary-icon">🎨</span>
+    <span class="summary-text">${imageFiles.length} image${imageFiles.length > 1 ? 's' : ''} ready • ${sizeMB} MB total</span>
+  `;
+  imageSummary.style.display = 'block';
+}
+
+convertBtn.addEventListener('click', async () => {
+  if (!imageFiles.length) {
+    showAlert('Please select at least one image file.', 'warning');
+    return;
+  }
+
+  try {
+    loading.style.display = 'flex';
+    updateLoadingStatus('Converting Images...', 'Creating PDF from your images', 0);
+    showProgress();
+    
+    const pdfDoc = await PDFLib.PDFDocument.create();
+    let processedImages = 0;
+    
+    for (const imageObj of imageFiles) {
+      const progress = (processedImages / imageFiles.length) * 80;
+      updateLoadingStatus('Processing Images...', `Converting ${imageObj.file.name}`, progress);
+      
+      const arrayBuffer = await imageObj.file.arrayBuffer();
+      let image;
+      
+      if (imageObj.file.type === 'image/jpeg' || imageObj.file.type === 'image/jpg') {
+        image = await pdfDoc.embedJpg(arrayBuffer);
+      } else {
+        image = await pdfDoc.embedPng(arrayBuffer);
+      }
+      
+      let pageWidth, pageHeight;
+      
+      if (pageSize.value === 'fit') {
+        pageWidth = image.width;
+        pageHeight = image.height;
+      } else {
+        const sizes = {
+          'A4': [595, 842],
+          'Letter': [612, 792],
+          'Legal': [612, 1008],
+          'A3': [842, 1191]
+        };
+        [pageWidth, pageHeight] = sizes[pageSize.value];
+      }
+      
+      const page = pdfDoc.addPage([pageWidth, pageHeight]);
+      
+      let imgWidth = image.width;
+      let imgHeight = image.height;
+      
+      if (maintainAspectRatio.checked && pageSize.value !== 'fit') {
+        const scaleX = pageWidth / imgWidth;
+        const scaleY = pageHeight / imgHeight;
+        const scale = Math.min(scaleX, scaleY);
+        
+        imgWidth *= scale;
+        imgHeight *= scale;
+      } else if (pageSize.value !== 'fit') {
+        imgWidth = pageWidth;
+        imgHeight = pageHeight;
+      }
+      
+      const x = (pageWidth - imgWidth) / 2;
+      const y = (pageHeight - imgHeight) / 2;
+      
+      page.drawImage(image, {
+        x,
+        y,
+        width: imgWidth,
+        height: imgHeight
+      });
+      
+      processedImages++;
+    }
+    
+    updateLoadingStatus('Finalizing PDF...', 'Creating final document', 90);
+    
+    const pdfBytes = await pdfDoc.save();
+    const blob = new Blob([pdfBytes], { type: 'application/pdf' });
+    
+    const filename = imageOutputName.value.trim() || 'images-to-pdf';
+    const finalFilename = filename.endsWith('.pdf') ? filename : `${filename}.pdf`;
+    
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = finalFilename;
+    link.click();
+    
+    updateLoadingStatus('Complete!', 'PDF created successfully', 100);
+    showAlert(`Images converted successfully! ${finalFilename} downloaded.`, 'success');
+    
+  } catch (error) {
+    console.error('Conversion error:', error);
+    showAlert('Error converting images to PDF. Please try again.', 'error');
+  } finally {
+    loading.style.display = 'none';
+    hideProgress();
+  }
+});
 

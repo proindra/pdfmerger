@@ -20,6 +20,7 @@
       <button class="pricing-btn" id="pricingBtn">💰 Premium ₹9</button>
       <button class="login-btn" id="loginBtn">👤 Login</button>
       <a href="https://www.linkedin.com/in/prajwalindra-h-7b2841319" target="_blank" class="linkedin-btn">🔗 LinkedIn</a>
+      <button class="images-btn" id="imagesBtn">🖼️ Images</button>
       <button class="lang-toggle" id="langToggle">🌐 ಕನ್ನಡ</button>
       <button class="dark-toggle" id="darkToggle">☀️ Light Mode</button>
     </div>
@@ -241,6 +242,96 @@
           <span class="btn-icon">🔗</span>
           <span class="btn-text">Share PDF</span>
         </button>
+      </div>
+    </div>
+
+    <!-- Images to PDF Section -->
+    <div class="image-converter" id="imageToPdfSection">
+      <div class="converter-header">
+        <div class="header-content">
+          <div class="header-icon">🎨</div>
+          <div class="header-text">
+            <h1>Images to PDF Converter</h1>
+            <p>Transform your images into professional PDF documents</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="converter-body">
+        <input type="file" id="imageInput" multiple accept="image/*" hidden>
+        
+        <div class="upload-area" id="imageDropArea">
+          <div class="upload-content">
+            <div class="upload-visual">
+              <div class="upload-circle">
+                <span class="upload-plus">+</span>
+              </div>
+              <div class="upload-animation"></div>
+            </div>
+            <h3>Drag & Drop Images</h3>
+            <p>or <button class="link-btn" id="imageInputBtn">browse files</button></p>
+            <div class="supported-formats">
+              <span>JPG</span><span>PNG</span><span>GIF</span><span>BMP</span><span>WEBP</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="image-gallery" id="imageList">
+          <div class="gallery-empty">
+            <div class="empty-icon">🖼️</div>
+            <p>Your images will appear here</p>
+          </div>
+        </div>
+
+        <div class="converter-settings">
+          <div class="settings-grid">
+            <div class="setting-card">
+              <div class="setting-icon">📄</div>
+              <div class="setting-content">
+                <label>PDF Name</label>
+                <input type="text" id="imageOutputName" placeholder="my-document">
+              </div>
+            </div>
+            <div class="setting-card">
+              <div class="setting-icon">📏</div>
+              <div class="setting-content">
+                <label>Page Size</label>
+                <select id="pageSize">
+                  <option value="A4">A4 (210 × 297 mm)</option>
+                  <option value="Letter">Letter (8.5 × 11 in)</option>
+                  <option value="Legal">Legal (8.5 × 14 in)</option>
+                  <option value="A3">A3 (297 × 420 mm)</option>
+                  <option value="fit">Fit to Image</option>
+                </select>
+              </div>
+            </div>
+            <div class="setting-card">
+              <div class="setting-icon">⚙️</div>
+              <div class="setting-content">
+                <label>Options</label>
+                <div class="checkbox-group">
+                  <div class="option-item">
+                    <input type="checkbox" id="maintainAspectRatio" class="checkbox" checked>
+                    <label for="maintainAspectRatio">Keep Aspect Ratio</label>
+                  </div>
+                  <div class="option-item">
+                    <input type="checkbox" id="imageCompressOption" class="checkbox">
+                    <label for="imageCompressOption">Compress Images</label>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="converter-footer">
+          <div id="imageSummary" class="conversion-summary" style="display: none;"></div>
+          <button class="convert-button" id="convertBtn">
+            <span class="btn-icon">⚡</span>
+            <span class="btn-text">Convert to PDF</span>
+            <div class="btn-shine"></div>
+          </button>
+        </div>
       </div>
     </div>
   </div>
