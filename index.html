@@ -208,51 +208,49 @@
               <span>Have a coupon code?</span>
             </div>
             <div class="coupon-input-group">
-              <input type="text" id="couponCode" class="modern-input" placeholder="Enter coupon code..." maxlength="20">
-              <button id="applyCoupon" class="coupon-btn">Apply</button>
-              <button id="removeCoupon" class="coupon-remove-btn" style="display: none;">Remove</button>
+              <input type="text" id="couponCode" class="modern-input" placeholder="Enter coupon code...">
+              <button class="coupon-btn" id="applyCoupon">Apply</button>
+              <button class="coupon-remove-btn" id="removeCoupon" style="display: none;">Remove</button>
             </div>
           </div>
           
           <div class="premium-notice" id="premiumNotice">
-            <p>✨ Upgrade to Premium for advanced features and enhanced functionality</p>
+            <p>💎 Unlock all premium features with a valid coupon code or upgrade to Premium for ₹9!</p>
           </div>
         </div>
       </div>
 
       <div id="validationAlert" class="validation-alert" style="display: none;">
         <div class="alert-content">
-          <span class="alert-icon">⚠️</span>
+          <span class="alert-icon" id="alertIcon">⚠️</span>
           <span class="alert-message" id="alertMessage"></span>
-          <button class="alert-close" id="alertClose">✖</button>
+          <button class="alert-close" id="alertClose">×</button>
         </div>
       </div>
 
       <div class="actions">
-        <button id="previewBtn" class="action-btn btn-preview">
-          <span class="btn-icon">👀</span>
+        <button class="action-btn btn-preview" id="previewBtn">
+          <span class="btn-icon">👁️</span>
           <span class="btn-text">Preview PDF</span>
         </button>
-        <button id="mergeBtn" class="action-btn btn-merge">
-          <span class="btn-icon">⚡</span>
+        <button class="action-btn btn-merge" id="mergeBtn">
+          <span class="btn-icon">🔗</span>
           <span class="btn-text">Merge PDFs</span>
+        </button>
+        <button class="action-btn btn-share" id="shareBtn" style="display: none;">
+          <span class="btn-icon">🔗</span>
+          <span class="btn-text">Share PDF</span>
         </button>
       </div>
     </div>
   </div>
 
-  <footer>
-    Made with ❤️ by 
-    <a href="https://www.linkedin.com/in/prajwalindra-h-7b2841319" target="_blank">
-      PRAJWALINDRA
-    </a>
-  </footer>
-
+  <!-- Loading Modal -->
   <div class="loading" id="loading">
     <div class="loading-content">
       <div class="spinner"></div>
-      <h3 id="loadingTitle">Processing your PDFs...</h3>
-      <p id="loadingText">This may take a few moments</p>
+      <h3 id="loadingTitle">Processing...</h3>
+      <p id="loadingText">Please wait while we process your files</p>
       <div class="progress-container" id="progressContainer" style="display: none;">
         <div class="progress-bar">
           <div class="progress-fill" id="progressFill"></div>
@@ -266,21 +264,46 @@
   <div class="login-modal" id="loginModal">
     <div class="modal-content">
       <div class="modal-header">
-        <h3>👤 User Login</h3>
-        <button class="modal-close" id="modalClose">✖</button>
+        <h3>Login to PDF Merger Pro</h3>
+        <button class="modal-close" id="modalClose">×</button>
       </div>
       <div class="modal-body">
         <p class="login-notice">Please login to continue using PDF Merger Pro</p>
         <div class="login-form">
-          <div class="input-group">
-            <label for="userName">Name:</label>
-            <input type="text" id="userName" class="modern-input" placeholder="Enter your name..." maxlength="50">
+          <input type="text" id="userName" class="modern-input" placeholder="Enter your name..." maxlength="50">
+          <input type="password" id="userPasscode" class="modern-input" placeholder="Enter passcode..." maxlength="20">
+          <button class="login-submit-btn" id="loginSubmit">Login</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Share Modal -->
+  <div class="share-modal" id="shareModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>Share Your PDF</h3>
+        <button class="modal-close" id="shareModalClose">×</button>
+      </div>
+      <div class="modal-body">
+        <div class="share-content">
+          <div class="share-info">
+            <p>Share your merged PDF directly:</p>
+            <div class="share-details">
+              <span class="share-filename" id="shareFilename"></span>
+            </div>
           </div>
-          <div class="input-group">
-            <label for="userPasscode">Passcode:</label>
-            <input type="password" id="userPasscode" class="modern-input" placeholder="Enter passcode..." maxlength="20">
+          <div class="share-actions">
+            <button class="share-action-btn email-btn" id="emailShareBtn">
+              <span>📧</span> Email
+            </button>
+            <button class="share-action-btn whatsapp-btn" id="whatsappShareBtn">
+              <span>💬</span> WhatsApp
+            </button>
+            <button class="share-action-btn telegram-btn" id="telegramShareBtn">
+              <span>✈️</span> Telegram
+            </button>
           </div>
-          <button id="loginSubmit" class="login-submit-btn">Login</button>
         </div>
       </div>
     </div>

@@ -35,6 +35,7 @@ const loadingText = document.getElementById('loadingText');
 const validationAlert = document.getElementById('validationAlert');
 const alertMessage = document.getElementById('alertMessage');
 const alertClose = document.getElementById('alertClose');
+const alertIcon = document.getElementById('alertIcon');
 const couponCode = document.getElementById('couponCode');
 const applyCoupon = document.getElementById('applyCoupon');
 const removeCoupon = document.getElementById('removeCoupon');
@@ -47,6 +48,16 @@ const userPasscode = document.getElementById('userPasscode');
 const loginSubmit = document.getElementById('loginSubmit');
 const pricingBtn = document.getElementById('pricingBtn');
 const langToggle = document.getElementById('langToggle');
+const shareBtn = document.getElementById('shareBtn');
+const shareModal = document.getElementById('shareModal');
+const shareModalClose = document.getElementById('shareModalClose');
+const shareLink = document.getElementById('shareLink');
+const copyLinkBtn = document.getElementById('copyLinkBtn');
+const shareFilename = document.getElementById('shareFilename');
+const emailShareBtn = document.getElementById('emailShareBtn');
+const whatsappShareBtn = document.getElementById('whatsappShareBtn');
+const telegramShareBtn = document.getElementById('telegramShareBtn');
+const actionsDiv = document.querySelector('.actions');
 
 // Language State
 let currentLang = 'en';
@@ -121,6 +132,22 @@ let files = [];
 function showAlert(message, type = 'warning') {
   alertMessage.textContent = message;
   validationAlert.className = `validation-alert ${type}`;
+  
+  // Set appropriate icon based on alert type
+  switch(type) {
+    case 'success':
+      alertIcon.textContent = '✅';
+      break;
+    case 'error':
+      alertIcon.textContent = '❌';
+      break;
+    case 'info':
+      alertIcon.textContent = 'ℹ️';
+      break;
+    default:
+      alertIcon.textContent = '⚠️';
+  }
+  
   validationAlert.style.display = 'block';
   
   // Auto-hide after 5 seconds
@@ -838,6 +865,17 @@ mergeBtn.addEventListener("click", async () => {
     summaryDiv.style.background = "linear-gradient(135deg, var(--success), #38b2ac)";
     
     showAlert('PDF merged successfully! Your download should start automatically.', 'success');
+    
+    // Show share button after successful merge
+    shareBtn.style.display = 'block';
+    actionsDiv.classList.add('has-share');
+    
+    // Store the merged PDF for sharing
+    window.lastMergedPDF = {
+      blob: blob,
+      filename: finalFilename,
+      timestamp: Date.now()
+    };
     
     // Increment merge count and make login mandatory after first merge
     mergeCount++;
@@ -1610,4 +1648,60 @@ function adjustAlertForMobile() {
 // Call mobile adjustments
 adjustModalForMobile();
 adjustAlertForMobile();
+
+// Share Feature Implementation
+shareBtn.addEventListener('click', () => {
+  if (!window.lastMergedPDF) {
+    showAlert('No PDF available to share. Please merge files first.', 'warning');
+    return;
+  }
+  
+  // Show share modal
+  shareFilename.textContent = window.lastMergedPDF.filename;
+  shareModal.style.display = 'flex';
+});
+
+// Share modal close handlers
+shareModalClose.addEventListener('click', () => {
+  shareModal.style.display = 'none';
+});
+
+shareModal.addEventListener('click', (e) => {
+  if (e.target === shareModal) {
+    shareModal.style.display = 'none';
+  }
+});
+
+
+
+// Social sharing handlers
+emailShareBtn.addEventListener('click', () => {
+  const subject = encodeURIComponent(`PDF Document: ${window.lastMergedPDF.filename}`);
+  const body = encodeURIComponent(`Hi,\n\nI've created a PDF document: ${window.lastMergedPDF.filename}\n\nPlease find the PDF file attached or I'll send it separately.\n\nBest regards`);
+  window.open(`mailto:?subject=${subject}&body=${body}`);
+});
+
+whatsappShareBtn.addEventListener('click', () => {
+  const message = encodeURIComponent(`📄 *${window.lastMergedPDF.filename}*\n\nI've created a PDF document. I'll send it to you separately.`);
+  window.open(`https://wa.me/?text=${message}`);
+});
+
+telegramShareBtn.addEventListener('click', () => {
+  const message = encodeURIComponent(`📄 ${window.lastMergedPDF.filename}\n\nI've created a PDF document. I'll send it to you separately.`);
+  window.open(`https://t.me/share/url?text=${message}`);
+});
+
+
+
+// Clean up expired shares (run periodically)
+function cleanupExpiredShares() {
+  if (window.lastMergedPDF && Date.now() - window.lastMergedPDF.timestamp > 24 * 60 * 60 * 1000) {
+    window.lastMergedPDF = null;
+    shareBtn.style.display = 'none';
+    actionsDiv.classList.remove('has-share');
+  }
+}
+
+// Run cleanup every hour
+setInterval(cleanupExpiredShares, 60 * 60 * 1000);
 
